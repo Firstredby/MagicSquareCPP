@@ -1,0 +1,228 @@
+//---------------------------------------------------------------------------
+#include <vcl.h>
+#include <fstream>
+#pragma hdrstop
+#include "Unit1.h"
+#include "Unit2.h"
+//---------------------------------------------------------------------------
+#pragma package(smart_init)
+#pragma resource "*.dfm"
+TForm1 *Form1;
+TStringGrid *StringGrid1;
+
+//---------------------------------------------------------------------------
+__fastcall TForm1::TForm1(TComponent* Owner) : TForm(Owner) {
+    Image1->SendToBack();
+}
+
+void CenterFormOnScreen(TForm *form) {
+	form->Left = (Screen->Width - form->Width) / 2;
+	form->Top = (Screen->Height - form->Height) / 2;
+}
+
+int** CreateSquare(int rowCount, int colCount, TStringGrid* stringGrid) {
+	int** arr = new int*[rowCount];
+	for (int i = 0; i < rowCount; i++) {
+		arr[i] = new int[colCount];
+	}
+	for (int i = 0; i < rowCount; i++) {
+		for (int j = 0; j < colCount; j++) {
+			arr[i][j] = StrToInt(stringGrid->Cells[i][j]);
+		}
+	}
+	return arr;
+}
+
+bool isPrime(int n) {
+	if (n <= 1) {
+		return false;
+	}
+	for (int i = 2; i <= sqrt(n); i++) {
+		if (n % i == 0) {
+			return false;
+		}
+	}
+	return true;
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm1::RadioButton1Click(TObject *Sender) {
+	StringGrid1->RowCount = 2;
+	StringGrid1->ColCount = 2;
+	StringGrid1->FixedCols = 0;
+	StringGrid1->FixedRows = 0;
+	StringGrid1->Width = 155;
+	StringGrid1->Height = 155;
+	StringGrid1->DefaultColWidth = 75;
+	StringGrid1->DefaultRowHeight = 75;
+	StringGrid1->Left = 272;
+	StringGrid1->Top = 120;
+	StringGrid1->Options = StringGrid1->Options << goEditing;
+
+	if (RadioButton1->Checked)
+		StringGrid1->Visible = true;
+	else
+		StringGrid1->Visible = false;
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm1::RadioButton2Click(TObject *Sender) {
+	StringGrid1->RowCount = 3;
+	StringGrid1->ColCount = 3;
+	StringGrid1->FixedCols = 0;
+	StringGrid1->FixedRows = 0;
+	StringGrid1->Width = 192;
+	StringGrid1->Height = 192;
+	StringGrid1->DefaultColWidth = 62;
+	StringGrid1->DefaultRowHeight = 62;
+	StringGrid1->Left = 260;
+	StringGrid1->Top = 105;
+	StringGrid1->Options = StringGrid1->Options << goEditing;
+
+	if (RadioButton2->Checked)
+		StringGrid1->Visible = true;
+	else
+		StringGrid1->Visible = false;
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm1::RadioButton3Click(TObject *Sender) {
+	StringGrid1->RowCount = 4;
+	StringGrid1->ColCount = 4;
+	StringGrid1->FixedCols = 0;
+	StringGrid1->FixedRows = 0;
+	StringGrid1->Width = 199;
+	StringGrid1->Height = 199;
+	StringGrid1->DefaultColWidth = 48;
+	StringGrid1->DefaultRowHeight = 48;
+	StringGrid1->Left = 255;
+	StringGrid1->Top = 98;
+	StringGrid1->Options = StringGrid1->Options << goEditing;
+
+	if (RadioButton3->Checked)
+		StringGrid1->Visible = true;
+	else
+		StringGrid1->Visible = false;
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm1::RadioButton4Click(TObject *Sender) {
+		StringGrid1->RowCount = 5;
+		StringGrid1->ColCount = 5;
+		StringGrid1->FixedCols = 0;
+		StringGrid1->FixedRows = 0;
+		StringGrid1->Width = 213;
+		StringGrid1->Height = 213;
+		StringGrid1->DefaultColWidth = 41;
+		StringGrid1->DefaultRowHeight = 41;
+		StringGrid1->Left = 255;
+		StringGrid1->Top = 90;
+		StringGrid1->Options = StringGrid1->Options << goEditing;
+
+	if (RadioButton4->Checked)
+		StringGrid1->Visible = true;
+	else
+		StringGrid1->Visible = false;
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm1::Button1Click(TObject *Sender) {
+	int** arr = CreateSquare(StringGrid1->RowCount, StringGrid1->ColCount, StringGrid1);
+
+	//проверка квадрата
+    int sum = 0;
+	for (int j = 0; j < StringGrid1->RowCount; j++) {
+		sum += arr[0][j]; // сумма первой строки
+	}
+
+	bool isMagic = true;
+	for (int i = 1; i < StringGrid1->RowCount; i++) {
+		int rowSum = 0, colSum = 0;
+		for (int j = 0; j < StringGrid1->RowCount; j++) {
+			rowSum += arr[i][j]; // сумма строки
+			colSum += arr[j][i]; // сумма столбца
+		}
+		if (rowSum != sum || colSum != sum) {
+			isMagic = false;
+			break;
+		}
+	}
+
+	int diagSum1 = 0, diagSum2 = 0;
+	for (int i = 0; i < StringGrid1->RowCount; i++) {
+		diagSum1 += arr[i][i]; // сумма главной диагонали
+		diagSum2 += arr[i][StringGrid1->RowCount-i-1]; // сумма побочной диагонали
+	}
+	if (diagSum1 != sum || diagSum2 != sum) {
+		isMagic = false;
+	}
+
+
+	bool prim = false;
+
+	if(CheckBox1->Checked){
+		for(int i = 0; i < StringGrid1->RowCount; i++){
+			for(int j = 0; j < StringGrid1->ColCount; j++){
+				if(isPrime(arr[i][j])){
+					prim = true;
+					break;
+				}
+			}
+		}
+		if(isMagic == true && prim == true)
+			ShowMessage("Цей квадрат є магічним та має простi числа");
+		else if(isMagic == true && prim == false)
+			ShowMessage("Цей квадрат є магічним i не має простих чисел");
+		else
+            ShowMessage("Цей квадрат не є магічним i не має простих чисел");
+	} else {
+		if(isMagic == true)
+			ShowMessage("Цей квадрат є магічним");
+		else
+			ShowMessage("Цей квадрат не є магічним");
+	}
+
+	for (int i = 0; i < StringGrid1->RowCount; i++) {
+		delete[] arr[i];
+	}
+	delete[] arr;
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm1::Button2Click(TObject *Sender) {
+	int** brr = CreateSquare(StringGrid1->RowCount, StringGrid1->ColCount, StringGrid1);
+	const char* filename = "output.txt";
+	// Открываем файл для записи
+	std::ofstream file(filename);
+
+    // Если не удалось открыть файл, выходим из функции
+	if (!file.is_open())
+    {
+		std::cerr << "Failed to create file: " << filename << std::endl;
+        return;
+    }
+
+	// Записываем данные из массива в файл
+	for (int i = 0; i < StringGrid1->RowCount; i++) {
+		for(int j = 0; j < StringGrid1->RowCount; j++){
+			file << brr[i][j] << " ";
+		}
+		file << std::endl;
+    }
+
+	// Закрываем файл
+	file.close();
+    for (int i = 0; i < StringGrid1->RowCount; i++) {
+		delete[] brr[i];
+	}
+	delete[] brr;
+
+	// Закрываем файл
+	file.close();
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm1::FormCreate(TObject *Sender)
+{
+	CenterFormOnScreen(this);
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm1::FormClose(TObject *Sender, TCloseAction &Action)
+{
+	Application->Terminate();
+}
+//---------------------------------------------------------------------------
+
